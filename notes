@@ -1,0 +1,9 @@
+-What content to download? 
+	Title, paragraph, content, href
+	Ignore things:  script, syntax elements ('<', '=', etc.)
+-Preference to title?
+-Crawl links, then download?
+	Already have links; so start with that
+	Can modify crawler to traverse URL list
+-Study page sources to understand what useful things to scrape and what not to
+-Character encoding issue
