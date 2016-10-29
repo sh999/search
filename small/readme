@@ -1,0 +1,6 @@
+Experiment on small scale of search
+e.g.
+	Make mock documents with simple terms
+	Calculate tf idf, document vector
+	Give simple query, calculate dist. w/ doc vectors
+	Find best doc given a query
