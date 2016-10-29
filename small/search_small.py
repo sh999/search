@@ -2,6 +2,24 @@ import pprint as pp
 import re
 import operator
 
+def idf(doc_counts):
+	'''
+		Input: Word counts for each doc 
+		Return: Inverse doc freq (idf) for all terms
+			idf for a term relates to how many docs have that term
+	'''
+	unique_terms = [] # All unique terms in corpus; used to check if a term is already seen 
+	idfs = {}
+	for doc in doc_counts:
+		for term in doc:
+			if term[0] not in unique_terms:
+				unique_terms.append(term[0])
+				idfs[term[0]] = 1
+			else:
+				idfs[term[0]] += 1
+	idfs = sorted(idfs.items(), key=operator.itemgetter(1))
+	return idfs
+
 def count_all(doc_counts):
 	'''
 		Input: Word counts for each doc
@@ -58,6 +76,8 @@ def main():
 		doc_term_counts.append(count_doc(t))
 	corpus_counts = count_all(doc_term_counts)
 	# pp.pprint(corpus_counts)
-	pp.pprint(doc_term_counts[0])
+	idfs = idf(doc_term_counts)
+	pp.pprint(idfs)
+
 
 main()
