@@ -1,6 +1,30 @@
+from __future__ import division
 import pprint as pp
 import re
 import operator
+
+def term_vectors(tf, idf):
+	'''
+		Input:
+			tf: Word count for each doc
+			idf: Inverse doc freq of each term in corpus
+		Return:
+			Each term in each doc will have a value (tf/idf for the term)
+			So each doc will have a vector of the term values  
+	'''
+	print "tf:"
+	# pp.pprint(tf)
+	print "idf:"
+	# pp.pprint(idf[-5:])
+	vec = []
+	b = "hi"
+	for doc in tf:
+		for term in doc:
+			# print term
+			vec.extend([term, term[1],idf[term[0]],term[1]/idf[term[0]]])
+	pp.pprint(vec)
+	# pp.pprint(idf)
+
 
 def idf(doc_counts):
 	'''
@@ -17,7 +41,7 @@ def idf(doc_counts):
 				idfs[term[0]] = 1
 			else:
 				idfs[term[0]] += 1
-	idfs = sorted(idfs.items(), key=operator.itemgetter(1))
+	# idfs = sorted(idfs.items(), key=operator.itemgetter(1))
 	return idfs
 
 def count_all(doc_counts):
@@ -74,10 +98,9 @@ def main():
 		doc_terms.append(parse(d))
 	for t in doc_terms: # Get word count for all docs
 		doc_term_counts.append(count_doc(t))
-	corpus_counts = count_all(doc_term_counts)
-	# pp.pprint(corpus_counts)
+	# corpus_counts = count_all(doc_term_counts)
 	idfs = idf(doc_term_counts)
-	pp.pprint(idfs)
+	tfidf = term_vectors(doc_term_counts, idfs)
 
 
 main()
