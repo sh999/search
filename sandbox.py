@@ -16,4 +16,9 @@ def set_test():
 	b = Set([2,3,4])
 	print a.intersection(b)
 
-set_test()
+def split_test():
+	a = "hey there"
+	b = "hey"
+	print(a.split())
+	print(b.split())
+split_test()
