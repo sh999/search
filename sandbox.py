@@ -1,5 +1,8 @@
 import re
 from sets import Set
+import urllib2
+from bs4 import BeautifulSoup
+import pprint as pp
 def re_test():
 	a = "We will rock you.  Tonight."
 	regex = re.compile('[^a-zA-Z]')
@@ -21,4 +24,17 @@ def split_test():
 	b = "hey"
 	print(a.split())
 	print(b.split())
-split_test()
+def soup_test():
+	url = 'https://en.wikipedia.org/wiki/Occult'
+	request = urllib2.Request(url)
+	site = urllib2.urlopen(request, timeout=3)
+	soup = BeautifulSoup(site, "html.parser")
+	# pp.pprint(soup)
+	print(type(soup))
+	par = []
+	for ptag in soup.find_all('p'):
+		print type(ptag.get_text().encode('ascii','ignore'))
+		par.extend([ptag.get_text().encode('ascii','ignore')]) 
+	# pp.pprint(a)
+	print(len(par))
+soup_test()

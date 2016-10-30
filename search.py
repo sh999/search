@@ -26,27 +26,54 @@ def parse(inputstring):
 	terms = [x.encode('ascii','ignore') for x in terms]
 	return terms
 
-def parse2(terms):
+def get_terms(text):
 	'''
-		Parse one document into a list of words
-		 with only letters
-		Return: Docs with term list
-			{'doc1':['term1'...'termX'], 'doc2:..}
+		Input:
+			text: list of strings, each may be a paragraph 
+		Return: 
+			list of distinct terms/words
 	'''
 	s = []
-	for t in terms:
+	regex = re.compile('[^a-zA-Z]')
+	for t in text:
 		t = t.split()
 		t = [x.encode('ascii','ignore') for x in t]
+		t = [regex.sub('',w).lower() for w in t]
 		s.extend(t)
-	# terms = [x.encode('ascii','ignore') for x in terms]
+	# text = [x.encode('ascii','ignore') for x in text]
+	stops = ['the', 'a', 'in','of','as','and','on','to',
+			 'by','was','is','are','am','an','be']
+	s = [x for x in s if x != '' and x not in stops]
 	return s
+
+def get_pars(url):
+	'''
+		Given URL, get HTML, parse for <p> text,
+		return list of paragraphs 
+	'''
+	request = urllib2.Request(url)
+	site = urllib2.urlopen(request, timeout=3)
+	soup = BeautifulSoup(site, "html.parser")
+	# pp.pprint(soup)
+	print(type(soup))
+	par = []
+	for ptag in soup.find_all('p'):
+		print type(ptag.get_text().encode('ascii','ignore'))
+		par.extend([ptag.get_text().encode('ascii','ignore')]) 
+	# pp.pprint(a)
+	print(len(par))
+	return par 
 
 def get_soup(url):
 	request = urllib2.Request(url)
 	site = urllib2.urlopen(request, timeout=3)
 	site_soup = BeautifulSoup(site, "html.parser") 
-	texts = site_soup.find_all(text=True)
-	tag_a = site_soup.find_all("p")
+	# texts = site_soup.find_all("p").getText()
+	texts = site_soup.get_text()
+	# print texts
+	return texts
+	# texts = site_soup.find_all("p")
+	# print(texts)
 	# for i in tag_a:
 	# 	print i
 	visible_texts = filter(visible, texts)
@@ -64,6 +91,8 @@ def get_html(url):
 	site_soup = BeautifulSoup(site, "html.parser") 
 	texts = site_soup.find_all(text=True)
 	tag_a = site_soup.find_all("p")
+	texts = site_soup.find_all()
+
 	return texts
 
 def get2(url):
@@ -86,13 +115,8 @@ def get2(url):
 		pass
 	return text
 
-url = "http://www.wsj.com/"
-
-vis_texts = get_soup(url)
-# vis_texts = get2(url)
-# pprint(vis_texts)
-# a = vis_texts[0:100]
-# print(a)
-parsed = parse2(vis_texts)
-pprint(parsed)
-x = ["hey","my"]
+url = 'https://www.engr.uky.edu/visit/'
+par = get_pars(url)
+terms = get_terms(par)
+pprint(terms)
+pprint(len(terms))
