@@ -72,16 +72,28 @@ def run_urls(urls):
 			{'www.site1.com':[word1,word2,...],...,'site2.com':...}
 	'''
 	url_terms = {}
+	print "Processing URLS to get terms..."
 	for url in urls:
 		url_terms[url] =  process_url(url)
 	# pprint(url_terms)
+	print "Calculating tfidfs..."
 	tfs = [] 		# Term freq: Word count for each term in a doc
 	inv_index = get_inv_index(url_terms) # Inverted index (term -> doc1,doc2,)
 	tfs = get_tfs(url_terms)
 	# corpus_counts = count_all(tfs)
 	idfs = get_idfs(tfs)
 	tfidfs = get_tfidfs(tfs, idfs)
+	
 	# pprint(tfidfs)
-
+	print "Searching docs with query..."
+	query = "This is the best query in the world, wow, awesome search engine to boot"
+	query = query.split()
+	tophits = get_doc_hits(query,inv_index,tfidfs)
+	# print "query:",
+	# pp.pprint(query)
+	# print "doc hits:"
+	# pp.pprint(tophits)
+	scores = get_scores(query,tophits,tfidfs)
+	pp.pprint(scores)
 urls = parse_feed('url_feed2')
 run_urls(urls)
