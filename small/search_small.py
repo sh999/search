@@ -28,7 +28,7 @@ def term_vectors(tf, idf):
 	# pp.pprint(idf)
 
 
-def idf(doc_counts):
+def idf(tfs):
 	'''
 		Input: Word counts for each doc 
 		Return: Inverse doc freq (idf) for all terms
@@ -36,13 +36,16 @@ def idf(doc_counts):
 	'''
 	unique_terms = [] # All unique terms in corpus; used to check if a term is already seen 
 	idfs = {}
-	for doc in doc_counts:
-		for term in doc:
-			if term[0] not in unique_terms:
-				unique_terms.append(term[0])
-				idfs[term[0]] = 1
+	for doc_name in tfs:
+		for term in tfs[doc_name]:
+			if term not in unique_terms:
+				# unique_terms.append(term[0])
+				# idfs[term[0]] = 1
+				unique_terms.append(term)
+				idfs[term] = 1
 			else:
-				idfs[term[0]] += 1
+				# idfs[term[0]] += 1
+				idfs[term] += 1
 	# idfs = sorted(idfs.items(), key=operator.itemgetter(1))
 	return idfs
 
@@ -108,16 +111,13 @@ def main():
 	docs = ["./"+i for i in docs]
 	doc_terms = {}  # List of documents; each doc is list of terms
 	doc_term_counts = []
-	# for d in docs: # Build list of terms for each doc
-	# 	doc_terms.append(parse(d))
 	doc_terms = parse(docs)
 	doc_term_counts = count_terms(doc_terms)
-	# for t in doc_terms: # Get word count for all docs
-	# 	doc_term_counts.append(count_terms(t))
 	# corpus_counts = count_all(doc_term_counts)
 	idfs = idf(doc_term_counts)
 	# tfidf = term_vectors(doc_term_counts, idfs)
-	pp.pprint(doc_terms)
-	pp.pprint(doc_term_counts)
-
+	# pp.pprint(doc_terms)
+	# pp.pprint(doc_term_counts)
+	pp.pprint(idfs)
+	
 main()
