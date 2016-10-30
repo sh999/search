@@ -2,6 +2,7 @@ from __future__ import division
 import pprint as pp
 import re
 import operator
+from sets import Set
 
 def get_tfidfs(tfs, idfs):
 	'''
@@ -109,17 +110,31 @@ def parse(docs):
 		terms[d] = words
 	return terms
 
-def search(query, tfidfs):
+def search(query, inv_index, tfidfs):
 	'''
 		Inputs:  
 			Query: List of words
-			tfidfs: Tf-idf values for a set of terms in a set documents
+			tfidfs: Tf-idf values for a Set of terms in a Set documents
 				{'doc1':{'term1':(tf,idf,tfidf),..}, 'doc2':{...},...}
+			Inverted index
 		Output:
 			Document that has highest similarity for the query
 				Computed based on vector similarity between query and doc vector
 	'''
-	pass
+	docs_to_get = Set()
+	first = True
+	for term in query:  
+		if term in inv_index:
+			temp_docs = inv_index[term]
+			print "term:", term
+			pp.pprint(temp_docs)
+			if first:
+				docs_to_get = temp_docs
+				first = False
+			else:
+				docs_to_get = docs_to_get.union(temp_docs)  # For now, get set of docs that contain any of the query terms
+	return docs_to_get
+
 def get_inv_index(docs):
 	'''
 		Input: 
@@ -131,11 +146,11 @@ def get_inv_index(docs):
 	inv_index = {}
 	unique_terms = []
 	for doc_name in docs:
-		doc_set = set()
+		doc_set = Set()
 		for term in docs[doc_name]:
 			if term not in unique_terms:
 				unique_terms.append(term)
-				inv_index[term] = set()
+				inv_index[term] = Set()
 				inv_index[term].add(doc_name)
 			else:
 				inv_index[term].add(doc_name)
@@ -153,7 +168,11 @@ def main():
 	# corpus_counts = count_all(tfs)
 	idfs = get_idfs(tfs)
 	tfidfs = get_tfidfs(tfs, idfs)
-	query = ["oaths","kindness","love"]
-	tophit = search(query,tfidfs)
+	
+
+	# query = ["thy","love"]
+	query = "why are you so bad"
+	query = query.split()
+	tophit = search(query,inv_index,tfidfs)
 
 main()
