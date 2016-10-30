@@ -16,12 +16,14 @@ def term_vectors(tf, idf):
 	# pp.pprint(tf)
 	print "idf:"
 	# pp.pprint(idf[-5:])
-	vec = []
+	vec = {}
 	b = "hi"
 	for doc in tf:
 		for term in doc:
 			# print term
-			vec.extend([term, term[1],idf[term[0]],term[1]/idf[term[0]]])
+			
+			vec.append(([term[0],idf[term[0]],term[1]/idf[term[0]]]))
+
 	pp.pprint(vec)
 	# pp.pprint(idf)
 
@@ -60,47 +62,62 @@ def count_all(doc_counts):
 	counts = sorted(counts.items(), key=operator.itemgetter(1))
 	return counts
 
-def count_doc(terms):
+def count_terms(doc_terms):
 	'''
 		Input: List of words
 		Return: Word counts
 			e.g. 'the' appears in this doc, x times
+			{'doc1':{'the':10,'falls':3'...}, 'doc2':..., ...}
 	'''
-	counts = {}
-	for term in terms:
-		if term not in counts:
-			counts[term] = 1
-		else:
-			counts[term] += 1 
-	counts = sorted(counts.items(), key=operator.itemgetter(1))
-	return counts
+	all_counts = {}
+	for doc_name in doc_terms:
+		counts = {}
+		all_counts[doc_name] = None
+		for term in doc_terms[doc_name]:
+			if term not in counts:
+				counts[term] = 1
+			else:
+				counts[term] += 1 
+				
+		all_counts[doc_name] = counts
+		# counts = sorted(counts.items(), key=operator.itemgetter(1))
+	return all_counts
 
-def parse(doc):
+def parse(docs):
 	'''
 		Parse one document into a list of words
 		 with only letters
+		Return: Docs with term list
+			{'doc1':['term1'...'termX'], 'doc2:..}
 	'''
-	doc_input = open(doc)
-	words = []
-	regex = re.compile('[^a-zA-Z]')
-	for i in doc_input.readlines():  # Split text to indiv. words
-		temp_words = i.split()
-		temp_words = [regex.sub('',w).lower() for w in temp_words]
-		words.extend(temp_words)
-	return words
+	terms = {}
+	for d in docs: # Build list of terms for each doc
+	# 	doc_terms.append(parse(d))
+		doc_file = open(d)
+		words = []
+		regex = re.compile('[^a-zA-Z]')
+		for i in doc_file.readlines():  # Split text to indiv. words
+			temp_words = i.split()
+			temp_words = [regex.sub('',w).lower() for w in temp_words]
+			words.extend(temp_words)
+		terms[d] = words
+	return terms
 
 def main():
 	docs = ["doc1","doc2","doc3","doc4","doc5"]
 	docs = ["./"+i for i in docs]
-	doc_terms = []  # List of documents; each doc is list of terms
+	doc_terms = {}  # List of documents; each doc is list of terms
 	doc_term_counts = []
-	for d in docs: # Build list of terms for each doc
-		doc_terms.append(parse(d))
-	for t in doc_terms: # Get word count for all docs
-		doc_term_counts.append(count_doc(t))
+	# for d in docs: # Build list of terms for each doc
+	# 	doc_terms.append(parse(d))
+	doc_terms = parse(docs)
+	doc_term_counts = count_terms(doc_terms)
+	# for t in doc_terms: # Get word count for all docs
+	# 	doc_term_counts.append(count_terms(t))
 	# corpus_counts = count_all(doc_term_counts)
 	idfs = idf(doc_term_counts)
-	tfidf = term_vectors(doc_term_counts, idfs)
-
+	# tfidf = term_vectors(doc_term_counts, idfs)
+	pp.pprint(doc_terms)
+	pp.pprint(doc_term_counts)
 
 main()
