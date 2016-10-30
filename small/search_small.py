@@ -109,6 +109,17 @@ def parse(docs):
 		terms[d] = words
 	return terms
 
+def search(query, tfidfs):
+	'''
+		Inputs:  
+			Query: List of words
+			tfidfs: Tf-idf values for a set of terms in a set documents
+				{'doc1':{'term1':(tf,idf,tfidf),..}, 'doc2':{...},...}
+		Output:
+			Document that has highest similarity for the query
+				Computed based on vector similarity between query and doc vector
+	'''
+	pass
 def main():
 	docs = ["doc1","doc2","doc3","doc4","doc5"]
 	docs = ["./"+i for i in docs]
@@ -119,6 +130,9 @@ def main():
 	# corpus_counts = count_all(tfs)
 	idfs = get_idfs(tfs)
 	tfidfs = get_tfidfs(tfs, idfs)
-	pp.pprint(tfidfs)
+	# pp.pprint(tfidfs)
+
+	query = ["oaths","kindness","love"]
+	tophit = search(query,tfidfs)
 
 main()
