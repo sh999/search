@@ -120,18 +120,39 @@ def search(query, tfidfs):
 				Computed based on vector similarity between query and doc vector
 	'''
 	pass
+def get_inv_index(docs):
+	'''
+		Input: 
+			Collection of documents and terms in each doc 
+		Return:
+			Inverted index 
+				{'term1':['doc1','doc3'], 'term2':['doc3'], ...}
+	'''
+	inv_index = {}
+	unique_terms = []
+	for doc_name in docs:
+		doc_set = set()
+		for term in docs[doc_name]:
+			if term not in unique_terms:
+				unique_terms.append(term)
+				inv_index[term] = set()
+				inv_index[term].add(doc_name)
+			else:
+				inv_index[term].add(doc_name)
+	# pp.pprint(inv_index)
+	return inv_index
+
 def main():
 	docs = ["doc1","doc2","doc3","doc4","doc5"]
 	docs = ["./"+i for i in docs]
 	doc_terms = {}  # List of documents; each doc is list of terms
 	tfs = [] 		# Term freq: Word count for each term in a doc
-	doc_terms = parse(docs)
+	doc_terms = parse(docs) # Collection of terms in docs without counts
+	inv_index = get_inv_index(doc_terms) # Inverted index (term -> doc1,doc2,)
 	tfs = get_tfs(doc_terms)
 	# corpus_counts = count_all(tfs)
 	idfs = get_idfs(tfs)
 	tfidfs = get_tfidfs(tfs, idfs)
-	# pp.pprint(tfidfs)
-
 	query = ["oaths","kindness","love"]
 	tophit = search(query,tfidfs)
 
