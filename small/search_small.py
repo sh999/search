@@ -110,7 +110,7 @@ def parse(docs):
 		terms[d] = words
 	return terms
 
-def search(query, inv_index, tfidfs):
+def get_doc_hits(query, inv_index, tfidfs):
 	'''
 		Inputs:  
 			Query: List of words
@@ -126,8 +126,8 @@ def search(query, inv_index, tfidfs):
 	for term in query:  
 		if term in inv_index:
 			temp_docs = inv_index[term]
-			print "term:", term
-			pp.pprint(temp_docs)
+			# print "term:", term
+			# pp.pprint(temp_docs)
 			if first:
 				docs_to_get = temp_docs
 				first = False
@@ -157,6 +157,28 @@ def get_inv_index(docs):
 	# pp.pprint(inv_index)
 	return inv_index
 
+def get_scores(query,tophits,tfidfs):
+	'''
+		Inputs:
+			query: list of terms in query
+			tophits: set of docs whose score will be calculated based on query
+			tfidfs: tfidf scores for each doc 
+		Return:
+			A score for each doc based on similarity with query
+	'''
+	scores = {}
+	for doc_name in tophits:
+		detailed = []
+		doc_score = 0
+		for term in query:
+			if term in tfidfs[doc_name]:
+				to_add = tfidfs[doc_name][term][2]
+				doc_score = doc_score + to_add
+				detailed.append([term,to_add,doc_score])
+		# scores[doc_name] = detailed
+		scores[doc_name] = doc_score
+	return scores
+
 def main():
 	docs = ["doc1","doc2","doc3","doc4","doc5"]
 	docs = ["./"+i for i in docs]
@@ -171,8 +193,14 @@ def main():
 	
 
 	# query = ["thy","love"]
-	query = "why are you so bad"
+	query = "In loving thee thou know'st I am forsworn"
 	query = query.split()
-	tophit = search(query,inv_index,tfidfs)
-
+	tophits = get_doc_hits(query,inv_index,tfidfs)
+	print "query:",
+	# pp.pprint(query)
+	print "doc hits:"
+	# pp.pprint(tophits)
+	scores = get_scores(query,tophits,tfidfs)
+	pp.pprint(scores)
+	
 main()

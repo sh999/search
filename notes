@@ -10,8 +10,12 @@
 -Calculate tf-idf score for each term for each document
 	Will serve as dimensions for the vector
 	Each document will be a vector determined from tf-idf scores
+
 -For a search:
 	Make vector out of query terms
 	Calculate vector distance from query to each document
 	Doc that has smallest distance will be top hit
 -Then combine with pagerank
+
+versions:
+
