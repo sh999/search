@@ -3,7 +3,7 @@ import pprint as pp
 import re
 import operator
 
-def term_vectors(tf, idf):
+def get_tfidfs(tfs, idfs):
 	'''
 		Input:
 			tf: Word count for each doc
@@ -12,23 +12,26 @@ def term_vectors(tf, idf):
 			Each term in each doc will have a value (tf/idf for the term)
 			So each doc will have a vector of the term values  
 	'''
-	print "tf:"
-	# pp.pprint(tf)
-	print "idf:"
-	# pp.pprint(idf[-5:])
-	vec = {}
-	b = "hi"
-	for doc in tf:
-		for term in doc:
+	# print "tf:"
+	# pp.pprint(tfs)
+	# print "idfs:"
+	# pp.pprint(idfs)
+	tfidfs = {}
+	for doc_name in tfs:
+		temp_doc = {}
+		for term in tfs[doc_name]:
 			# print term
-			
-			vec.append(([term[0],idf[term[0]],term[1]/idf[term[0]]]))
+			temp_tf = tfs[doc_name][term]
+			temp_idf = idfs[term]
+			temp_tfidf = temp_tf/temp_idf
+			temp_doc[term] = (temp_tf,temp_idf,temp_tfidf)
+			# tfidfs.append(([term[0],idfs[term[0]],term[1]/idfs[term[0]]]))
+		tfidfs[doc_name] = temp_doc
+	# print "tfidfs:"
+	# pp.pprint(tfidfs)
+	return tfidfs
 
-	pp.pprint(vec)
-	# pp.pprint(idf)
-
-
-def idf(tfs):
+def get_idfs(tfs):
 	'''
 		Input: Word counts for each doc 
 		Return: Inverse doc freq (idf) for all terms
@@ -65,7 +68,7 @@ def count_all(doc_counts):
 	counts = sorted(counts.items(), key=operator.itemgetter(1))
 	return counts
 
-def count_terms(doc_terms):
+def get_tfs(doc_terms):
 	'''
 		Input: List of words
 		Return: Word counts
@@ -110,14 +113,12 @@ def main():
 	docs = ["doc1","doc2","doc3","doc4","doc5"]
 	docs = ["./"+i for i in docs]
 	doc_terms = {}  # List of documents; each doc is list of terms
-	doc_term_counts = []
+	tfs = [] 		# Term freq: Word count for each term in a doc
 	doc_terms = parse(docs)
-	doc_term_counts = count_terms(doc_terms)
-	# corpus_counts = count_all(doc_term_counts)
-	idfs = idf(doc_term_counts)
-	# tfidf = term_vectors(doc_term_counts, idfs)
-	# pp.pprint(doc_terms)
-	# pp.pprint(doc_term_counts)
-	pp.pprint(idfs)
-	
+	tfs = get_tfs(doc_terms)
+	# corpus_counts = count_all(tfs)
+	idfs = get_idfs(tfs)
+	tfidfs = get_tfidfs(tfs, idfs)
+	pp.pprint(tfidfs)
+
 main()
