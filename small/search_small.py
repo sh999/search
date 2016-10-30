@@ -179,8 +179,8 @@ def get_scores(query,tophits,tfidfs):
 		scores[doc_name] = doc_score
 	return scores
 
-def main():
-	docs = ["doc1","doc2","doc3","doc4","doc5"]
+def doc_to_scores(docs):
+	# docs = ["doc1","doc2","doc3","doc4","doc5"]
 	docs = ["./"+i for i in docs]
 	doc_terms = {}  # List of documents; each doc is list of terms
 	tfs = [] 		# Term freq: Word count for each term in a doc
@@ -193,14 +193,15 @@ def main():
 	
 
 	# query = ["thy","love"]
-	query = "In loving thee thou know'st I am forsworn"
+	query = "In loving thee thou know'st I am forsworn Thus is his cheek the map of days outworn"
 	query = query.split()
 	tophits = get_doc_hits(query,inv_index,tfidfs)
-	print "query:",
+	# print "query:",
 	# pp.pprint(query)
-	print "doc hits:"
+	# print "doc hits:"
 	# pp.pprint(tophits)
 	scores = get_scores(query,tophits,tfidfs)
 	pp.pprint(scores)
-	
-main()
+
+docs = ["doc1","doc2","doc3","doc4","doc5"]
+doc_to_scores(docs)
