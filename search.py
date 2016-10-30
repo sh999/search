@@ -33,16 +33,11 @@ def get_pars(url):
 		return list of paragraphs 
 	'''
 	request = urllib2.Request(url)
-	site = urllib2.urlopen(request, timeout=3)
+	site = urllib2.urlopen(request, timeout=10)
 	soup = BeautifulSoup(site, "html.parser")
-	# pp.pprint(soup)
-	print(type(soup))
 	par = []
 	for ptag in soup.find_all('p'):
-		print type(ptag.get_text().encode('ascii','ignore'))
 		par.extend([ptag.get_text().encode('ascii','ignore')]) 
-	# pp.pprint(a)
-	print(len(par))
 	return par 
 
 def process_url(url):
@@ -50,13 +45,16 @@ def process_url(url):
 		Input: URL
 		Return: List of terms in URL's html
 	'''
-
-	url = 'https://www.en.wikipedia.org'
+	# url = 'https://www.en.wikipedia.org'
 	par = get_pars(url)
 	terms = get_terms(par)
 	return terms
 
 def parse_feed(input_file):
+	'''
+		Input: Path to json file with url link
+		Return: List of urls
+	'''
 	pages = []
 	counter = 0
 	with open(input_file) as f:
@@ -64,13 +62,19 @@ def parse_feed(input_file):
 			line = json.loads(line)	
 			site = line['url'].encode('ascii','ignore')	
 			pages.extend([site])
-	print(pages)
+	return pages
 
-def process_urls():
-	url_feed = open('urlfeed','r')
-	url = 'https://www.en.wikipedia.org'
-	urlcontent = process_url(url)
-	pprint(urlcontent)
-	url_feed.close()
+def run_urls(urls):
+	'''
+		Input: List of URL strings
+		Return: Collection of URLs with distinct terms
+			{'www.site1.com':[word1,word2,...],...,'site2.com':...}
+	'''
+	url_terms = {}
+	for url in urls:
+		url_terms[url] =  process_url(url)
+	pprint(url_terms)
+	
 
-parse_feed('url_feed')
+urls = parse_feed('url_feed2')
+run_urls(urls)

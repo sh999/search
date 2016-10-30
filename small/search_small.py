@@ -185,6 +185,7 @@ def doc_to_scores(docs):
 	doc_terms = {}  # List of documents; each doc is list of terms
 	tfs = [] 		# Term freq: Word count for each term in a doc
 	doc_terms = parse(docs) # Collection of terms in docs without counts
+	pp.pprint(doc_terms)
 	inv_index = get_inv_index(doc_terms) # Inverted index (term -> doc1,doc2,)
 	tfs = get_tfs(doc_terms)
 	# corpus_counts = count_all(tfs)
