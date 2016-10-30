@@ -1,11 +1,3 @@
-'''
-	Derived from search_small.py 
-	Main difference:  
-		In search_small.py, you give filename strings
-		 to compute scores for each filename given query
-		Here, will provide list of URL's to return scores 
-		 based on query
-'''
 from __future__ import division
 import pprint as pp
 import re
@@ -193,6 +185,7 @@ def doc_to_scores(docs):
 	doc_terms = {}  # List of documents; each doc is list of terms
 	tfs = [] 		# Term freq: Word count for each term in a doc
 	doc_terms = parse(docs) # Collection of terms in docs without counts
+	pp.pprint(doc_terms)
 	inv_index = get_inv_index(doc_terms) # Inverted index (term -> doc1,doc2,)
 	tfs = get_tfs(doc_terms)
 	# corpus_counts = count_all(tfs)
@@ -200,7 +193,6 @@ def doc_to_scores(docs):
 	tfidfs = get_tfidfs(tfs, idfs)
 	
 
-	# query = ["thy","love"]
 	query = "In loving thee thou know'st I am forsworn Thus is his cheek the map of days outworn"
 	query = query.split()
 	tophits = get_doc_hits(query,inv_index,tfidfs)
@@ -211,5 +203,3 @@ def doc_to_scores(docs):
 	scores = get_scores(query,tophits,tfidfs)
 	pp.pprint(scores)
 
-docs = ["doc1","doc2","doc3","doc4","doc5"]
-doc_to_scores(docs)

@@ -6,6 +6,7 @@ import re
 from pprint import pprint
 import pickle
 import json
+from helper import *
 
 def get_terms(text):
 	'''
@@ -73,8 +74,14 @@ def run_urls(urls):
 	url_terms = {}
 	for url in urls:
 		url_terms[url] =  process_url(url)
-	pprint(url_terms)
-	
+	# pprint(url_terms)
+	tfs = [] 		# Term freq: Word count for each term in a doc
+	inv_index = get_inv_index(url_terms) # Inverted index (term -> doc1,doc2,)
+	tfs = get_tfs(url_terms)
+	# corpus_counts = count_all(tfs)
+	idfs = get_idfs(tfs)
+	tfidfs = get_tfidfs(tfs, idfs)
+	# pprint(tfidfs)
 
 urls = parse_feed('url_feed2')
 run_urls(urls)
