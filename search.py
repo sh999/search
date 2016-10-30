@@ -4,6 +4,8 @@ import urllib2
 import urllib
 import re
 from pprint import pprint
+import pickle
+import json
 
 def get_terms(text):
 	'''
@@ -43,8 +45,32 @@ def get_pars(url):
 	print(len(par))
 	return par 
 
-url = 'https://www.engr.uky.edu/visit/'
-par = get_pars(url)
-terms = get_terms(par)
-pprint(terms)
-pprint(len(terms))
+def process_url(url):
+	'''
+		Input: URL
+		Return: List of terms in URL's html
+	'''
+
+	url = 'https://www.en.wikipedia.org'
+	par = get_pars(url)
+	terms = get_terms(par)
+	return terms
+
+def parse_feed(input_file):
+	pages = []
+	counter = 0
+	with open(input_file) as f:
+		for line in f:
+			line = json.loads(line)	
+			site = line['url'].encode('ascii','ignore')	
+			pages.extend([site])
+	print(pages)
+
+def process_urls():
+	url_feed = open('urlfeed','r')
+	url = 'https://www.en.wikipedia.org'
+	urlcontent = process_url(url)
+	pprint(urlcontent)
+	url_feed.close()
+
+parse_feed('url_feed')
