@@ -2,4 +2,6 @@
 *out
 *pyc
 *sitegraph*
-.cache*
+*.cache*
+*.tfidfs*
+*pdf

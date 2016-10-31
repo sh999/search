@@ -8,7 +8,7 @@ import pickle
 import json
 from helper import *
 import url_cache
-
+import sys
 def get_terms(text):
 	'''
 		Input:
@@ -36,22 +36,22 @@ def get_paragraphs(url, cache_path):
 	'''
 	request = urllib2.Request(url)
 	par = []
-	cache_file = open(cache_path, "r")
-	cache = pickle.load(cache_file)
-	cache_file.close()
+	# cache_file = open(cache_path, "r")
+	# cache = pickle.load(cache_file)
+	# cache_file.close()
 	try:
 		print "url:", url
 		site = urllib2.urlopen(request, timeout=1.2)
 		soup = BeautifulSoup(site, "html.parser")
 		print "\tSuccess"
-		cache.set_flag(url, 1)
-		cache_file = open(cache_path, "w")
-		pickle.dump(cache, cache_file)
-		cache_file.close()
+		# cache.set_flag(url, 1)
+		# cache_file = open(cache_path, "w")
+		# pickle.dump(cache, cache_file)
+		# cache_file.close()
 	except Exception, error:  # In case of timeouts
 		print "\tFail"
 		print error
-		cache_file.close()
+		# cache_file.close()
 		return par
 	for ptag in soup.find_all('p'):
 		par.extend([ptag.get_text().encode('ascii','ignore')]) 
@@ -81,7 +81,7 @@ def get_urls_from_feed(input_file):
 	return pages
 
 
-def run_urls(urls, cache_path):
+def build_tfidfs(urls,cache_path,tfidfs_out_path,inv_out_path):
 	'''
 		Input: List of URL strings
 		Return: Collection of URLs with distinct terms
@@ -103,13 +103,22 @@ def run_urls(urls, cache_path):
 	# corpus_counts = count_all(tfs)
 	idfs = get_idfs(tfs)
 	tfidfs = get_tfidfs(tfs, idfs)
-	tfidfs_save = open("tfidfs_1", "w")
+	print "Saving files..."
+	tfidfs_save = open(tfidfs_out_path, "w")
 	pickle.dump(tfidfs, tfidfs_save)
+	inv_index_save = open(inv_out_path,"w")
+	pickle.dump(inv_index,inv_index_save)
+	print "Done"
 
-
+def search(tfidfs_out_path,inv_out_path):
+	print "Loading tfidfs, inv_index..."
+	tfidfs_file = open(tfidfs_out_path,"r")
+	inv_file = open(inv_out_path,"r")
+	tfidfs = pickle.load(tfidfs_file)
+	inv_index = pickle.load(inv_file)
 	# pprint(tfidfs)
 	print "Searching docs with query..."
-	query = "software engineering with best practices and rigorous standards"
+	query = "unversity regulations contact person classes"
 	query = query.split()
 	tophits = get_doc_hits(query,inv_index,tfidfs)
 	# print "query:",
@@ -118,10 +127,16 @@ def run_urls(urls, cache_path):
 	# pp.pprint(tophits)
 	scores = get_scores(query,tophits,tfidfs)
 	pp.pprint(scores)
+	print(len(scores))
+	print "Done"
 
-# raw_feed = "sitegraph-engr-730pm.json"
-raw_feed = "url_feed"
+
+raw_feed = "sitegraph-engr-730pm.json"
+# raw_feed = "url_feed"
 cache_path = raw_feed+".cache"
+tfidfs_out_path = raw_feed+".tfidfs" # tfidfs
+inv_out_path = raw_feed+".inv" 		 # inverted index
+
 urls = get_urls_from_feed(raw_feed)
 initial = False
 # initial = True
@@ -131,6 +146,9 @@ else:
 	# url_cache = pickle.load(open(cache_path))
 	pass
 # print(len(urls))
-run_urls(urls, cache_path)
-cache = pickle.load(open(cache_path,"r"))
-cache.print_all()
+if sys.argv[1] == "build":
+	build_tfidfs(urls, cache_path,tfidfs_out_path,inv_out_path)
+elif sys.argv[1] == "search":
+	search(tfidfs_out_path,inv_out_path)
+else:
+	print "Invalid command"
