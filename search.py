@@ -7,6 +7,7 @@ from pprint import pprint
 import pickle
 import json
 from helper import *
+import url_cache
 
 def get_terms(text):
 	'''
@@ -28,30 +29,40 @@ def get_terms(text):
 	s = [x for x in s if x != '' and x not in stops]
 	return s
 
-def get_paragraphs(url):
+def get_paragraphs(url, cache_path):
 	'''
 		Given URL, get HTML, parse for <p> text,
 		return list of paragraphs 
 	'''
 	request = urllib2.Request(url)
 	par = []
+	cache_file = open(cache_path, "r")
+	cache = pickle.load(cache_file)
+	cache_file.close()
 	try:
-		site = urllib2.urlopen(request, timeout=0.01)
+		print "url:", url
+		site = urllib2.urlopen(request, timeout=1.2)
 		soup = BeautifulSoup(site, "html.parser")
-
-	except Exception:  # In case of timeouts
+		print "\tSuccess"
+		cache.set_flag(url, 1)
+		cache_file = open(cache_path, "w")
+		pickle.dump(cache, cache_file)
+		cache_file.close()
+	except Exception, error:  # In case of timeouts
+		print "\tFail"
+		print error
+		cache_file.close()
 		return par
 	for ptag in soup.find_all('p'):
 		par.extend([ptag.get_text().encode('ascii','ignore')]) 
 	return par 
 
-def get_terms_from_url(url):
+def get_terms_from_url(url, cache_path):
 	'''
 		Input: URL
 		Return: List of terms in URL's html
 	'''
-	# url = 'https://www.en.wikipedia.org'
-	par = get_paragraphs(url)
+	par = get_paragraphs(url, cache_path)
 	terms = get_terms(par)
 	return terms
 
@@ -70,7 +81,7 @@ def get_urls_from_feed(input_file):
 	return pages
 
 
-def run_urls(urls, need_tfidfs):
+def run_urls(urls, cache_path):
 	'''
 		Input: List of URL strings
 		Return: Collection of URLs with distinct terms
@@ -80,7 +91,7 @@ def run_urls(urls, need_tfidfs):
 	print "Processing URLS to get terms..."
 	counter = 0
 	for url in urls:
-		url_terms[url] =  get_terms_from_url(url)
+		url_terms[url] =  get_terms_from_url(url, cache_path)
 		counter += 1
 		if counter % 1 == 0:
 			print counter
@@ -93,7 +104,6 @@ def run_urls(urls, need_tfidfs):
 	idfs = get_idfs(tfs)
 	tfidfs = get_tfidfs(tfs, idfs)
 	
-
 	# pprint(tfidfs)
 	print "Searching docs with query..."
 	query = "software engineering with best practices and rigorous standards"
@@ -106,9 +116,18 @@ def run_urls(urls, need_tfidfs):
 	scores = get_scores(query,tophits,tfidfs)
 	pp.pprint(scores)
 
-raw_feed = "sitegraph-engr-730pm.json"
-# raw_feed = "url_feed"
-need_tfidfs = True  
+# raw_feed = "sitegraph-engr-730pm.json"
+raw_feed = "url_feed"
+cache_path = raw_feed+".cache"
 urls = get_urls_from_feed(raw_feed)
-print(len(urls))
-run_urls(urls, need_tfidfs)
+initial = False
+# initial = True
+if initial:
+	url_cache.init_cache(cache_path,urls)
+else:
+	# url_cache = pickle.load(open(cache_path))
+	pass
+# print(len(urls))
+run_urls(urls, cache_path)
+cache = pickle.load(open(cache_path,"r"))
+cache.print_all()

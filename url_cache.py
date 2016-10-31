@@ -15,28 +15,30 @@ class Cache:
 		# pprint(self.urls)
 		pprint(self.url_flags)
 
-def init_cache(path):
-	urls = ['http://www.nytimes.com',
-			'http://www.wsj.com',
-			'http://en.wikipedia.org',
-			'http://www.yahoo.com,',
-			'http://www.microsoft.com',
-			'http://news.bbc.co.uk']
+def init_cache(out_path, urls):
+	# urls = ['http://www.nytimes.com',
+	# 		'http://www.wsj.com',
+	# 		'http://en.wikipedia.org',
+	# 		'http://www.yahoo.com,',
+	# 		'http://www.microsoft.com',
+	# 		'http://news.bbc.co.uk']
 	url_cache = Cache(urls)
 	for url in urls:
-		request = urllib2.Request(url)
-		try:
-			print "Requesting ", url, "..."
-			site = urllib2.urlopen(request, timeout = 0.2)
-			url_cache.set_flag(url,1)
-			print "\tSuccess"
-		except Exception, e:
-			print "\tFail"
-			print e
-			url_cache.set_flag(url,0)			
+		# request = urllib2.Request(url)
+		# try:
+		# 	print "Requesting ", url, "..."
+		# 	site = urllib2.urlopen(request, timeout = 0.2)
+		# 	url_cache.set_flag(url,1)
+		# 	print "\tSuccess"
+		# except Exception, e:
+		# 	print "\tFail"
+		# 	print e
+		# 	url_cache.set_flag(url,0)			
+		url_cache.set_flag(url,0)
 	url_cache.print_all()
-	outfile = open(path,"w")
+	outfile = open(out_path,"w")
 	pickle.dump(url_cache, outfile)
+	outfile.close()
 	print "Done"
 def update_cache(cache_file):
 	cache = pickle.load(open(cache_file,"r"))
@@ -55,5 +57,7 @@ def update_cache(cache_file):
 			print e
 			cache.set_flag(url,0)	
 	cache.print_all()
-init_cache(".cache1")
+
+
+# init_cache(".cache1")
 # update_cache(".cache1")
