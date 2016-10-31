@@ -15,7 +15,7 @@ class Cache:
 		# pprint(self.urls)
 		pprint(self.url_flags)
 
-def init_cache():
+def init_cache(path):
 	urls = ['http://www.nytimes.com',
 			'http://www.wsj.com',
 			'http://en.wikipedia.org',
@@ -27,12 +27,33 @@ def init_cache():
 		request = urllib2.Request(url)
 		try:
 			print "Requesting ", url, "..."
-			site = urllib2.urlopen(request, timeout = 2)
+			site = urllib2.urlopen(request, timeout = 0.2)
 			url_cache.set_flag(url,1)
 			print "\tSuccess"
-		except Exception:
+		except Exception, e:
 			print "\tFail"
+			print e
 			url_cache.set_flag(url,0)			
 	url_cache.print_all()
-
-init_cache()
+	outfile = open(path,"w")
+	pickle.dump(url_cache, outfile)
+	print "Done"
+def update_cache(cache_file):
+	cache = pickle.load(open(cache_file,"r"))
+	cache.print_all()
+	unvisited = [k for k, v in cache.url_flags.items() if v == 0]
+	pprint(unvisited)
+	for url in unvisited:
+		request = urllib2.Request(url)
+		try:
+			print "Requesting ", url, "..."
+			site = urllib2.urlopen(request, timeout = 10)
+			cache.set_flag(url,1)
+			print "\tSuccess"
+		except Exception, e:
+			print "\tFail"
+			print e
+			cache.set_flag(url,0)	
+	cache.print_all()
+init_cache(".cache1")
+# update_cache(".cache1")
