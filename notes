@@ -1,12 +1,14 @@
 -What content to download? 
 	Title, paragraph, content, href
 	Ignore things:  script, syntax elements ('<', '=', etc.)
+	Do paragraphs for now; regex and BS4 allow for getting indiv. words
 -Preference to title?
+	Do paragraphs for now
 -Crawl links, then download?
 	Already have links; so start with that
 	Can modify crawler to traverse URL list
--Study page sources to understand what useful things to scrape and what not to
 -Character encoding issue
+	Converted unicode to ascii with ignore of unrecognized chars
 -Calculate tf-idf score for each term for each document
 	Will serve as dimensions for the vector
 	Each document will be a vector determined from tf-idf scores
@@ -16,6 +18,19 @@
 	Calculate vector distance from query to each document
 	Doc that has smallest distance will be top hit
 -Then combine with pagerank
-
+	How to combine?  Percentiles? Composite score?
 -Need to cache url feed, some urls that didn't get requested will be requested when time comes
+	Idea:
+	URL feed is in JSON: 
+		{{"url":"www.site.com",...}}
+		{{"url":"www.site2.com",...}}
+	Make a new object which holds:
+		Dict of URL names (use get_urls_from_feed() )
+			Store this as a pickle object of a 
+			 simple list of URL strings
+		Dict of URL names with status flag
+			0: Need to request to get data
+			1: Data for site already exists (terms already obtained)
+			Store this as a pickle object of dict: {'site.com':0, 'site2.com':1, 'site3.com':0}
+		
 

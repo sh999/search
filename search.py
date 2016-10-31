@@ -28,7 +28,7 @@ def get_terms(text):
 	s = [x for x in s if x != '' and x not in stops]
 	return s
 
-def get_pars(url):
+def get_paragraphs(url):
 	'''
 		Given URL, get HTML, parse for <p> text,
 		return list of paragraphs 
@@ -36,9 +36,10 @@ def get_pars(url):
 	request = urllib2.Request(url)
 	par = []
 	try:
-		site = urllib2.urlopen(request, timeout=4)
+		site = urllib2.urlopen(request, timeout=0.01)
 		soup = BeautifulSoup(site, "html.parser")
-	except Exception:
+
+	except Exception:  # In case of timeouts
 		return par
 	for ptag in soup.find_all('p'):
 		par.extend([ptag.get_text().encode('ascii','ignore')]) 
@@ -50,11 +51,11 @@ def get_terms_from_url(url):
 		Return: List of terms in URL's html
 	'''
 	# url = 'https://www.en.wikipedia.org'
-	par = get_pars(url)
+	par = get_paragraphs(url)
 	terms = get_terms(par)
 	return terms
 
-def parse_feed(input_file):
+def get_urls_from_feed(input_file):
 	'''
 		Input: Path to json file with url link
 		Return: List of urls
@@ -108,6 +109,6 @@ def run_urls(urls, need_tfidfs):
 raw_feed = "sitegraph-engr-730pm.json"
 # raw_feed = "url_feed"
 need_tfidfs = True  
-urls = parse_feed(raw_feed)
+urls = get_urls_from_feed(raw_feed)
 print(len(urls))
 run_urls(urls, need_tfidfs)
