@@ -17,5 +17,5 @@
 	Doc that has smallest distance will be top hit
 -Then combine with pagerank
 
-versions:
+-Need to cache url feed, some urls that didn't get requested will be requested when time comes
 
