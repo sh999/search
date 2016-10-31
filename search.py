@@ -103,7 +103,10 @@ def run_urls(urls, cache_path):
 	# corpus_counts = count_all(tfs)
 	idfs = get_idfs(tfs)
 	tfidfs = get_tfidfs(tfs, idfs)
-	
+	tfidfs_save = open("tfidfs_1", "w")
+	pickle.dump(tfidfs, tfidfs_save)
+
+
 	# pprint(tfidfs)
 	print "Searching docs with query..."
 	query = "software engineering with best practices and rigorous standards"
