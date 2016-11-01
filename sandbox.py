@@ -5,6 +5,7 @@ from bs4 import BeautifulSoup
 import pprint as pp
 import json
 import pickle
+import slate
 def re_test():
 	a = "We will rock you.  Tonight."
 	regex = re.compile('[^a-zA-Z]')
@@ -50,4 +51,40 @@ def json_test():
 	print(pages)
 	outfile = open("out", "w")
 	pickle.dump(pages, outfile)
-json_test()
+def get_terms(text):
+	'''
+		Input:
+			text: list of strings, each may be a paragraph 
+		Return: 
+			list of distinct terms/words
+	'''
+	s = []
+	regex = re.compile('[^a-zA-Z]')
+	for t in text:
+		t = t.split()
+		# t = [x.encode('ascii','ignore') for x in t]
+		t = [regex.sub('',w).lower() for w in t]
+		t = [w for w in t if len(w) > 3]
+		s.extend(t)
+	# text = [x.encode('ascii','ignore') for x in text]
+	stops = ['the', 'a', 'in','of','as','and','on','to',
+			 'by','was','is','are','am','an','be']
+	s = [x for x in s if x != '' and x not in stops]
+	return s
+def pdf_test():
+	with open("test.pdf", 'rb') as inputfile:
+		try:
+			doc = slate.PDF(inputfile)
+			# for i in doc:
+				# print type(i)
+				# print i
+			# words = [x.encode('ascii','ignore') for x in doc]
+			# words = [w for w in doc]
+			# pp.pprint(words)
+			terms = get_terms(doc)
+			for i in terms:
+				print i, len(i)
+		except Exception, error:
+			print error
+			pass
+pdf_test()
