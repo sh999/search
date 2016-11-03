@@ -2,11 +2,12 @@ import re
 from sets import Set
 import urllib2
 from bs4 import BeautifulSoup
-import pprint as pp
+from pprint import pprint
 import json
 import pickle
 import slate
 import os
+import ssl
 def re_test():
 	a = "We will rock you.  Tonight."
 	regex = re.compile('[^a-zA-Z]')
@@ -72,8 +73,8 @@ def get_terms(text):
 			 'by','was','is','are','am','an','be']
 	s = [x for x in s if x != '' and x not in stops]
 	return s
-def pdf_test(filepath):
-	print "pdf_test"
+def parse_pdf(filepath):
+	print "Parsing pdf..."
 	with open(filepath, 'rb') as inputfile:
 		try:
 			doc = slate.PDF(inputfile)
@@ -84,8 +85,9 @@ def pdf_test(filepath):
 			# words = [w for w in doc]
 			# pp.pprint(words)
 			terms = get_terms(doc)
-			for i in terms:
-				print i
+			# for i in terms:
+			# 	print i
+			return terms
 		except Exception, error:
 			print error
 			pass
@@ -121,20 +123,36 @@ def urllib_pdf():
 	# print s
 def download(pdf_list):
 	# download pdf file
-	
-		path = pdf_list[33]
-		for i in pdf_list:
-			try:
-				f = urllib2.urlopen(i, timeout=0.2)
-				outpath = './pdf/dl.pdf'
-				with open(outpath,'wb') as output:
-				  output.write(f.read())
-				pdf_test(outpath)
-				os.remove(outpath)
-			except urllib2.HTTPError, error:
-				print error
-				pass
-path = "sitegraph-engr-730pm.json"
+	doc_terms = {}
+	for i in pdf_list:
+		try:
+			f = urllib2.urlopen(i, timeout=0.5)
+			temp_pdf = './pdf/dl.pdf'
+			with open(temp_pdf,'wb') as output:
+			  output.write(f.read())
+			# parse_pdf(temp_pdf)
+			doc_terms[i] = parse_pdf(temp_pdf)
+			os.remove(temp_pdf)
+		except urllib2.HTTPError, error:
+			print error
+			pass
+		except ssl.SSLError, error:
+			print error
+			pass
+	pprint(doc_terms)
+def pdf_list_load():
+	f = "sitegraph-engr-9pm-7000.json.pdf_list"
+	f = open(f,"r")
+	f = pickle.load(f)
+	pprint(f)
+def download_pdfs():
+	data = "sitegraph-engr-9pm-7000.json.pdf_list"
+	data = open(data,"r")
+	data = pickle.load(data)
+	pdf_list = data.keys()
+	pprint(pdf_list)
+	download(pdf_list[0:4])
+	# pprint(data)
 
 
-download(pdf_list)
+download_pdfs()
