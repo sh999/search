@@ -6,6 +6,7 @@ import pprint as pp
 import json
 import pickle
 import slate
+import os
 def re_test():
 	a = "We will rock you.  Tonight."
 	regex = re.compile('[^a-zA-Z]')
@@ -71,8 +72,9 @@ def get_terms(text):
 			 'by','was','is','are','am','an','be']
 	s = [x for x in s if x != '' and x not in stops]
 	return s
-def pdf_test():
-	with open("test.pdf", 'rb') as inputfile:
+def pdf_test(filepath):
+	print "pdf_test"
+	with open(filepath, 'rb') as inputfile:
 		try:
 			doc = slate.PDF(inputfile)
 			# for i in doc:
@@ -83,8 +85,56 @@ def pdf_test():
 			# pp.pprint(words)
 			terms = get_terms(doc)
 			for i in terms:
-				print i, len(i)
+				print i
 		except Exception, error:
 			print error
 			pass
-pdf_test()
+def get_size(url):
+	f = urllib2.urlopen(url)
+	size= f.headers["Content-Length"]
+	print size
+def get_pdfs(pdf_list):
+	'''
+		Given list of urls to pdf files, process them
+	'''
+	# print pdf_list
+	for pdf in pdf_list:
+		f = urllib2.urlopen(pdf)
+		try:
+			size = f.headers["Content-Length"]
+			print size
+		except KeyError, error:
+			print error
+			pass
+		except urllib2.HTTPError, error:
+			print error
+			pass
+
+def urllib_pdf():
+	# directly read bytes from file url
+	# won't work with search
+	url = 'http://www.engr.uky.edu/me/files/2011/05/WMR_4-12-07.pdf'
+	f = urllib2.urlopen(url)
+	s = f.read()
+	print s[1:400]
+	# print type(s)
+	# print s
+def download(pdf_list):
+	# download pdf file
+	
+		path = pdf_list[33]
+		for i in pdf_list:
+			try:
+				f = urllib2.urlopen(i, timeout=0.2)
+				outpath = './pdf/dl.pdf'
+				with open(outpath,'wb') as output:
+				  output.write(f.read())
+				pdf_test(outpath)
+				os.remove(outpath)
+			except urllib2.HTTPError, error:
+				print error
+				pass
+path = "sitegraph-engr-730pm.json"
+
+
+download(pdf_list)
