@@ -176,7 +176,7 @@ def get_scores(query,tophits,tfidfs):
 				doc_score = doc_score + to_add
 				detailed.append([term,to_add,doc_score])
 		scores[doc_name] = doc_score
-		scores[doc_name] = detailed
+		# scores[doc_name] = detailed
 	return scores
 
 def doc_to_scores(docs):

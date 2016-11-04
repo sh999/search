@@ -68,8 +68,8 @@ def get_terms_from_url(url, cache_path):
 
 def get_urls_from_feed(input_file):
 	'''
-		Input: Path to json file with url link
-		Return: List of urls
+		Input: Path to json file with url link:  {'url':site1, 'linkedurls':[site2,site3,..]..}
+		Return: List of urls from the JSONs
 	'''
 	pages = []
 	counter = 0
@@ -118,7 +118,7 @@ def search(tfidfs_out_path,inv_out_path):
 	inv_index = pickle.load(inv_file)
 	# pprint(tfidfs)
 	print "Searching docs with query..."
-	query = "unversity regulations contact person classes"
+	query = "computer engineering"
 	query = query.split()
 	tophits = get_doc_hits(query,inv_index,tfidfs)
 	# print "query:",
@@ -126,18 +126,51 @@ def search(tfidfs_out_path,inv_out_path):
 	# print "doc hits:"
 	# pp.pprint(tophits)
 	scores = get_scores(query,tophits,tfidfs)
-	pp.pprint(scores)
+	sorted_scores = sorted(scores.items(), key=operator.itemgetter(1))
+	top = sorted_scores[-30:]
+	top_out = open("sitegraph-engr-9pm-7000.json.tophits","w")
+	top_out = pickle.dump(top,top_out)
+	pp.pprint(top)
+		
 	print(len(scores))
+	pr = "sitegraph-engr-9pm-7000.json.pr"
+	pr = open(pr,"r")
+	pr = pickle.load(pr)
+
+
 	print "Done"
+
+def apply_pr():
+	source = "sitegraph-engr-9pm-7000.json.tophits"
+	source = open(source,"r")
+	hits = pickle.load(source)
+	# pp.pprint(hits)
+	hits = {x[0][4:]:x[1] for x in hits if x[0][0:5] != "https"}
+	pp.pprint(hits)
+	pr = "sitegraph-engr-9pm-7000.json.pr"
+	pr = open(pr,"r")
+	pr = pickle.load(pr)
+	new_hits = {}
+	for h in hits:
+		try:
+			print pr[h]
+			score = pr[h] + hits[h]
+			new_hits[h] = score
+		except KeyError, error:
+			print "no pr found"
+			pass
+	new_hits = sorted(new_hits.items(), key=operator.itemgetter(1))
+
+	pprint(new_hits)
 
 
 raw_feed = "sitegraph-engr-9pm-7000.json"
 # raw_feed = "url_feed"
 cache_path = raw_feed+".cache"
-tfidfs_out_path = raw_feed+".tfidfs" # tfidfs
-inv_out_path = raw_feed+".inv" 		 # inverted index
+tfidfs_out_path = raw_feed+".tfidfs" # tfidfs path for future saving
+inv_out_path = raw_feed+".inv" 		 # inverted index for future saving
 
-urls = get_urls_from_feed(raw_feed)
+urls = get_urls_from_feed(raw_feed)  # Get URLs from raw json feed
 initial = False
 # initial = True
 if initial:
@@ -146,9 +179,11 @@ else:
 	# url_cache = pickle.load(open(cache_path))
 	pass
 # print(len(urls))
-if sys.argv[1] == "build":
+if sys.argv[1] == "build":   		# 'build' and 'search' are 2 modes of this program
 	build_tfidfs(urls, cache_path,tfidfs_out_path,inv_out_path)
 elif sys.argv[1] == "search":
 	search(tfidfs_out_path,inv_out_path)
+elif sys.argv[1] == "applypagerank":
+	apply_pr()
 else:
 	print "Invalid command"
